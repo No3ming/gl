@@ -30,6 +30,10 @@ export class GlTextureComponent implements OnInit {
     const canvas = document.querySelector('#c');
     // @ts-ignore
     const gl = canvas.getContext('webgl');
+    if (!gl) {
+      return;
+    }
+
     const program = createProgramFromText(gl, vertSource, fragSource);
     const positionAttrLocation = gl.getAttribLocation(program, 'a_position');
     const resolutionUniformLocation = gl.getAttribLocation(program, 'u_resolution');
@@ -45,6 +49,7 @@ export class GlTextureComponent implements OnInit {
       x + width, y + height,
       x + width, y
     ];
+
   }
 
 }
