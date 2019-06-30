@@ -8,11 +8,11 @@ import fragSource from './frag.frag';
 import img from './img.jpeg';
 
 @Component({
-  selector: 'app-gl-texture',
-  templateUrl: './gl-texture.component.html',
-  styleUrls: ['./gl-texture.component.less']
+  selector: 'app-gl-texture2',
+  templateUrl: './gl-texture2.component.html',
+  styleUrls: ['./gl-texture2.component.less']
 })
-export class GlTextureComponent implements OnInit {
+export class GlTexture2Component implements OnInit {
 
   constructor() {
   }
