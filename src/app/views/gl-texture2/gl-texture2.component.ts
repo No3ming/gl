@@ -120,39 +120,41 @@ export class GlTexture2Component implements OnInit {
       0, 1, 2
     ]
   };
-  kernels2 = {
-    normal: [
-      0, 0, 0,
-      0, 1, 0,
-      0, 0, 0
-    ],
-    gaussianBlur: [
-      0.045, 0.122, 0.045,
-      0.122, 0.332, 0.122,
-      0.045, 0.122, 0.045
-    ],
-    unsharpen: [
-      -1, -1, -1,
-      -1,  9, -1,
-      -1, -1, -1
-    ],
-    emboss: [
-      -2, -1,  0,
-      -1,  1,  1,
-      0,  1,  2
-    ]
-  }
+  effects = [
+    {name: 'gaussianBlur3', on: true},
+    {name: 'gaussianBlur3', on: true},
+    {name: 'gaussianBlur3', on: true},
+    {name: 'sharpness'},
+    {name: 'sharpness', on: true},
+    {name: 'sharpness', on: true},
+    {name: 'sharpen'},
+    {name: 'sharpen'},
+    {name: 'sharpen'},
+    {name: 'unsharpen', on: true},
+    {name: 'unsharpen'},
+    {name: 'unsharpen'},
+    {name: 'emboss', on: true},
+    {name: 'edgeDetect'},
+    {name: 'edgeDetect'},
+    {name: 'edgeDetect3'},
+    {name: 'edgeDetect3'},
+  ];
+  gl = {}
+
   ngOnInit() {
     this.main();
   }
-
+  kernelChange = (index, e) => {
+    this.effects[index].on = !this.effects[index].on
+    this.drawEffects();
+  }
   main = () => {
     const image = new Image();
     image.onload = () => {
       this.draw(image);
     };
     image.src = img;
-  }
+  };
   draw = (image) => {
     const canvas = document.querySelector('#c');
 
@@ -161,82 +163,118 @@ export class GlTexture2Component implements OnInit {
     if (!gl) {
       return;
     }
+    this.gl = gl
     const program = createProgramFromText(gl, vertSource, fragSource);
     const positionAttrLocation = gl.getAttribLocation(program, 'a_position');
     // lookup uniforms
-    const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
-    const textureSizeLocation = gl.getUniformLocation(program, 'u_textureSize');
-    const kernelLocation = gl.getUniformLocation(program, 'u_kernel[0]');
-    const kernelWeightLocation = gl.getUniformLocation(program, 'u_kernelWeight');
     const texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     this.setRectangle(gl, 0, 0, image.width, image.height);
-    const texcoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+    const texCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      0.0, 0.0,
-      1.0, 0.0,
-      0.0, 1.0,
-      0.0, 1.0,
-      1.0, 1.0,
-      1.0, 0.0
+      0.0,  0.0,
+      1.0,  0.0,
+      0.0,  1.0,
+      0.0,  1.0,
+      1.0,  0.0,
+      1.0,  1.0,
     ]), gl.STATIC_DRAW);
-    // Create a texture.
-    const createAndSetupTexture = (gl) => {
-      const texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-
-      // Set the parameters so we can render any size image.
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    }
-    createAndSetupTexture(gl);
-    // Upload the image into the texture.
+    const originalImageTexture = this.createAndSetupTexture(gl);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    const textures = [];
+    const frameBuffers = [];
+    // tslint:disable-next-line:forin
+    for (const ii in [0, 1]) {
+      const texture = this.createAndSetupTexture(gl);
+      textures.push(texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, image.width, image.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      const fbo = gl.createFramebuffer();
+      frameBuffers.push(fbo);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    }
+    const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    const textureSizeLocation = gl.getUniformLocation(program, 'u_textureSize');
+    const kernelLocation = gl.getUniformLocation(program, 'u_kernel[0]');
+    const kernelWeightLocation = gl.getUniformLocation(program, 'u_kernelWeight');
+    const flipYLocation = gl.getUniformLocation(program, 'u_flipY');
     const drawWithKernel = (name) => {
+      gl.uniform1fv(kernelLocation, this.kernels[name])
+      gl.uniform1f(kernelWeightLocation, this.computeKernelWeight(this.kernels[name]))
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+    this.drawEffects = (name) => {
+      const gl = this.gl
       resizeCanvasToDisplaySize(gl.canvas);
-      // Tell WebGL how to convert from clip space to pixels
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
       // Clear the canvas
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
-
-      // Tell it to use our program (pair of shaders)
       gl.useProgram(program);
       gl.enableVertexAttribArray(positionAttrLocation);
-      // 必须有
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.vertexAttribPointer(positionAttrLocation, 2, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(texcoordLocation);
-      // // Bind the position buffer.
-      gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
       gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
-      gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
+      // Tell it to use our program (pair of shaders)
       gl.uniform2f(textureSizeLocation, image.width, image.height);
-      gl.uniform1fv(kernelLocation, this.kernels[name])
-      gl.uniform1f(kernelWeightLocation, this.computeKernelWeight(this.kernels[name]));
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      gl.bindTexture(gl.TEXTURE_2D, originalImageTexture)
+      gl.uniform1f(flipYLocation, 1);
+      const setFramebuffer = (fbo, width, height) => {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.uniform2f(resolutionLocation, width, height);
+        gl.viewport(0, 0, width, height);
+      }
+      let count = 0
+      for (const ii in this.effects) {
+        if (this.effects[ii].on) {
+          // @ts-ignore
+          setFramebuffer(frameBuffers[count % 2], image.width, image.height)
+          drawWithKernel(this.effects[ii].name);
+          // @ts-ignore
+          gl.bindTexture(gl.TEXTURE_2D, textures[ii % 2]);
+          ++count;
+        }
+      }
+      gl.uniform1f(flipYLocation, -1);
+      setFramebuffer(null, image.width, image.height)
+      drawWithKernel('normal');
     };
-    drawWithKernel('emboss');
+    this.drawEffects('emboss');
+  }
+
+  createAndSetupTexture = (gl) => {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // Set the parameters so we can render any size image.
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    return texture;
   };
   computeKernelWeight = (arr) => {
     const weight = arr.reduce((a, v) => a + v);
     return weight <= 0 ? 1 : weight;
-  }
+  };
   setRectangle = (gl, x, y, width, height) => {
+    const x1 = x;
+    const y1 = y;
+    const x2 = x + width;
+    const y2 = y + height
     const position = [
-      x, y,
-      x + width, y,
-      x, y + height,
-      x, y + height,
-      x + width, y + height,
-      x + width, y
+      x1, y1,
+      x2, y1,
+      x1, y2,
+      x1, y2,
+      x2, y1,
+      x2, y2
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(position), gl.STATIC_DRAW);
-  }
+  };
 
 }

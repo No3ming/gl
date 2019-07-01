@@ -1,1 +1,6 @@
 <canvas id="c"></canvas>
+<div class="panel">
+ <p *ngFor="let item of effects; let index = index">
+   <input (change)="kernelChange(index, item.name)" type="checkbox" name="{{item.name}}" [checked]="item.on" id="{{item.name + index}}" value="{{item.name}}"/> <label for="{{item.name + index}}">{{item.name}}</label>
+ </p>
+</div>
