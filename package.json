@@ -9,6 +9,12 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm lint",
+      "pre-push": "npm test"
+    }
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "~8.0.3",

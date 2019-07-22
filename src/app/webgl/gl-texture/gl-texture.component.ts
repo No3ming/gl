@@ -6,7 +6,6 @@ import vertSource from './vert.vert';
 import fragSource from './frag.frag';
 // @ts-ignore
 import img from './img.jpeg';
-
 @Component({
   selector: 'app-gl-texture',
   templateUrl: './gl-texture.component.html',
@@ -141,7 +140,7 @@ export class GlTextureComponent implements OnInit {
       -1,  1,  1,
       0,  1,  2
     ]
-  }
+  };
   ngOnInit() {
     this.main();
   }
