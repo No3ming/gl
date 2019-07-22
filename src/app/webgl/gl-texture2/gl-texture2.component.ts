@@ -139,17 +139,17 @@ export class GlTexture2Component implements OnInit {
     {name: 'edgeDetect3'},
     {name: 'edgeDetect3'},
   ];
-  gl = {};
+  gl: WebGLObject = {};
 
-  program = {};
-  textures = []
-  positionAttrLocation = [];
-  positionBuffer = [];
+  program: WebGLProgram = {};
+  textures: WebGLTexture = []
+  positionAttrLocation = 0;
+  positionBuffer: WebGLBuffer = [];
   texcoordLocation = [];
-  texCoordBuffer = [];
+  texCoordBuffer: WebGLBuffer = [];
   textureSizeLocation = [];
   originalImageTexture = [];
-  frameBuffers = []
+  frameBuffers: Array<WebGLBuffer> = []
   // tslint:disable-next-line:new-parens
   image: HTMLImageElement = new Image;
   flipYLocation = [];
@@ -182,6 +182,7 @@ export class GlTexture2Component implements OnInit {
     this.gl = gl;
     const program = this.program = createProgramFromText(gl, vertSource, fragSource);
     this.positionAttrLocation = gl.getAttribLocation(program, 'a_position');
+    console.log(this.positionAttrLocation)
     // lookup uniforms
     this.texcoordLocation = gl.getAttribLocation(program, 'a_texCoord');
     const positionBuffer = this.positionBuffer = gl.createBuffer();
