@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { createProgramFromText, resizeCanvasToDisplaySize } from '../../utils/gl-utils';
+import {Component, OnInit} from '@angular/core';
+import {createProgramFromText, resizeCanvasToDisplaySize} from '../../utils/gl-utils';
 // @ts-ignore
 import vertexShaderSource from './1.vert';
 
@@ -10,7 +10,9 @@ import vertexShaderSource from './1.vert';
 })
 export class GlMapUniformComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+  }
+
   private vertexShaderSource = `
     attribute vec2 a_position;
     uniform vec2 u_resolution;
@@ -20,17 +22,19 @@ export class GlMapUniformComponent implements OnInit {
       vec2 clipSpace = oneToTwo - 1.0;
       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
     }
-  `
+  `;
   private fragmentShaderSource = `
     precision mediump float;
     uniform vec4 u_color;
     void main() {
       gl_FragColor = u_color / vec4(255, 255, 255, 1);
     }
-  `
+  `;
+
   ngOnInit() {
     this.drawMoreGL();
   }
+
   drawMoreGL = () => {
     const canvas = document.querySelector('#c');
     // @ts-ignore
@@ -39,18 +43,18 @@ export class GlMapUniformComponent implements OnInit {
     const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
     const colorUniformLocation = gl.getUniformLocation(program, 'u_color');
     const resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
-    const positionBuffer = gl.createBuffer()
+    const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT)
+    gl.clear(gl.COLOR_BUFFER_BIT);
     const size = 2;
     const type = gl.FLOAT;
     const normalized = false;
     const stride = 0;
     const offset = 0;
-    gl.useProgram(program)
+    gl.useProgram(program);
     // 凭什么要绑定两次
     // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
@@ -64,7 +68,7 @@ export class GlMapUniformComponent implements OnInit {
         this.getRandom(300),
         this.getRandom(300)
       );
-      gl.uniform4f(colorUniformLocation, this.getRandom(225), this.getRandom(225), this.getRandom(225), 1)
+      gl.uniform4f(colorUniformLocation, this.getRandom(225), this.getRandom(225), this.getRandom(225), 1);
       const primitive = gl.TRIANGLES;
       const count = 6;
       gl.drawArrays(primitive, offset, count);

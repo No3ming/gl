@@ -18,19 +18,19 @@ export class Trasition2Component implements OnInit {
     this.main();
   }
   main = () => {
-    const canvas = document.querySelector('#c')
+    const canvas = document.querySelector('#c');
     // @ts-ignore
     const gl = canvas.getContext('webgl');
     const program = createProgramFromText(gl, vertexShaderSource, fragmentShaderSource);
-    const positionLocation = gl.getAttribLocation(program, 'a_position')
-    const resolutionLocation = gl.getUniformLocation(program, 'u_resolution')
-    const colorLocation = gl.getUniformLocation(program, 'u_color')
-    const trasitionLocation = gl.getUniformLocation(program, 'u_trasiton')
-    const positionBuffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+    const positionLocation = gl.getAttribLocation(program, 'a_position');
+    const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    const colorLocation = gl.getUniformLocation(program, 'u_color');
+    const trasitionLocation = gl.getUniformLocation(program, 'u_trasiton');
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.useProgram(program);
-    gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
-    gl.uniform4f(colorLocation, 200, 0, 200, 1)
+    gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+    gl.uniform4f(colorLocation, 200, 0, 200, 1);
     const position = [
       // 1
       0, 0,
@@ -53,8 +53,8 @@ export class Trasition2Component implements OnInit {
       20, 50,
       100, 50,
       100, 30
-    ]
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(position), gl.STATIC_DRAW)
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(position), gl.STATIC_DRAW);
     resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0, 0, 0, 0);
@@ -72,10 +72,10 @@ export class Trasition2Component implements OnInit {
     }, 3000);
   }
   drawScene = (gl, trasitionLocation, trasition) => {
-    gl.uniform2fv(trasitionLocation, trasition)
+    gl.uniform2fv(trasitionLocation, trasition);
     const primitive = gl.TRIANGLES;
-    const count = 6 * 3
-    const offset = 0
+    const count = 6 * 3;
+    const offset = 0;
     gl.drawArrays(primitive, offset, count);
   }
 }

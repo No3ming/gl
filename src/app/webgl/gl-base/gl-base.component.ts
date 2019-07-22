@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import { createProgramFromText, resizeCanvasToDisplaySize } from '../../utils/gl-utils';
+import {createProgramFromText, resizeCanvasToDisplaySize} from '../../utils/gl-utils';
 
 @Component({
   selector: 'app-gl-base',
@@ -28,6 +28,7 @@ export class GlBaseComponent implements OnInit {
   ngOnInit() {
     this.drawTriangles();
   }
+
   drawTriangles = () => {
     const canvas = document.querySelector('#c');
     // @ts-ignore
@@ -38,7 +39,7 @@ export class GlBaseComponent implements OnInit {
     }
     const program = createProgramFromText(gl, this.vertexShaderSource, this.fragmentShaderSource);
     const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
-    const positionBuffer = gl.createBuffer()
+    const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     const positions = [
       0, 0,
@@ -60,7 +61,7 @@ export class GlBaseComponent implements OnInit {
     const stride = 0;
     const offset = 0;
     gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
-    const primitiveType = gl.TRIANGLES
+    const primitiveType = gl.TRIANGLES;
     const count = 3;
     gl.drawArrays(primitiveType, offset, count);
   }

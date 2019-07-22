@@ -6,6 +6,7 @@ import vertSource from './vert.vert';
 import fragSource from './frag.frag';
 // @ts-ignore
 import img from './img.jpeg';
+
 @Component({
   selector: 'app-gl-texture',
   templateUrl: './gl-texture.component.html',
@@ -132,15 +133,16 @@ export class GlTextureComponent implements OnInit {
     ],
     unsharpen: [
       -1, -1, -1,
-      -1,  9, -1,
+      -1, 9, -1,
       -1, -1, -1
     ],
     emboss: [
-      -2, -1,  0,
-      -1,  1,  1,
-      0,  1,  2
+      -2, -1, 0,
+      -1, 1, 1,
+      0, 1, 2
     ]
   };
+
   ngOnInit() {
     this.main();
   }
@@ -182,7 +184,7 @@ export class GlTextureComponent implements OnInit {
       1.0, 0.0
     ]), gl.STATIC_DRAW);
     // Create a texture.
-    const createAndSetupTexture = (gl) => {
+    const createAndSetupTexture = () => {
       const texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -191,8 +193,8 @@ export class GlTextureComponent implements OnInit {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    }
-    createAndSetupTexture(gl);
+    };
+    createAndSetupTexture();
     // Upload the image into the texture.
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     const drawWithKernel = (name) => {
@@ -214,14 +216,14 @@ export class GlTextureComponent implements OnInit {
       // // Bind the position buffer.
       gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
       gl.vertexAttribPointer(texcoordLocation, 2, gl.FLOAT, false, 0, 0);
-      gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
+      gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
       gl.uniform2f(textureSizeLocation, image.width, image.height);
-      gl.uniform1fv(kernelLocation, this.kernels[name])
+      gl.uniform1fv(kernelLocation, this.kernels[name]);
       gl.uniform1f(kernelWeightLocation, this.computeKernelWeight(this.kernels[name]));
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
     drawWithKernel('emboss');
-  };
+  }
   computeKernelWeight = (arr) => {
     const weight = arr.reduce((a, v) => a + v);
     return weight <= 0 ? 1 : weight;

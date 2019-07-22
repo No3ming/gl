@@ -60,7 +60,7 @@ export const createShaderFromScript = (gl, scriptId: string, optShaderType?: num
 
 export const createShaderFormText = (gl, shaderText: string, optShaderType: number) => {
   return compileShader(gl, shaderText, optShaderType);
-}
+};
 
 /**
  * 使用script标签获取gl代码
@@ -69,25 +69,25 @@ export const createProgramFromScripts = (gl, vertexShaderId: string, fragmentSha
   const vertexShader = createShaderFromScript(gl, vertexShaderId, gl.VERTEX_SHADER);
   const fragmentShader = createShaderFromScript(gl, fragmentShaderId, gl.FRAGMENT_SHADER);
   return createProgram(gl, vertexShader, fragmentShader);
-}
+};
 
 // 已经直接获取到gl代码
 export const createProgramFromText = (gl, vertexShaderText: string, fragmentShaderText: string) => {
   const vertexShader = createShaderFormText(gl, vertexShaderText, gl.VERTEX_SHADER);
   const fragmentShader = createShaderFormText(gl, fragmentShaderText, gl.FRAGMENT_SHADER);
   return createProgram(gl, vertexShader, fragmentShader);
-}
+};
 
 // 重置画布大小
 export const resizeCanvasToDisplaySize = (canvas: HTMLCanvasElement, multiplier?: number) => {
   multiplier = multiplier || 1;
   /*tslint:disable:no-bitwise*/
-  const width  = canvas.clientWidth * multiplier | 0;
+  const width = canvas.clientWidth * multiplier | 0;
   const height = canvas.clientHeight * multiplier | 0;
-  if (canvas.width !== width ||  canvas.height !== height) {
-    canvas.width  = width;
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
     canvas.height = height;
     return true;
   }
   return false;
-}
+};
