@@ -17,6 +17,8 @@ const routes: Routes = [
   { path: 'gl-rotation', component: GlRotationComponent },
 ];
 
+
+
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
