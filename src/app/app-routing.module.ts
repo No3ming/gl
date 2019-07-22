@@ -7,7 +7,6 @@ import {Trasition2Component} from './webgl/trasition2/trasition2.component';
 import {GlTextureComponent} from './webgl/gl-texture/gl-texture.component';
 import { GlTexture2Component } from './webgl/gl-texture2/gl-texture2.component';
 import {GlRotationComponent} from './webgl/gl-rotation/gl-rotation.component';
-
 const routes: Routes = [
   { path: 'gl-base', component: GlBaseComponent },
   { path: 'gl-uniform', component: GlUniformComponent },
