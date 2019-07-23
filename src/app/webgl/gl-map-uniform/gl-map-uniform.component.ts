@@ -55,7 +55,7 @@ export class GlMapUniformComponent implements OnInit {
     const stride = 0;
     const offset = 0;
     gl.useProgram(program);
-    // 凭什么要绑定两次
+    // 凭什么要绑定两次1
     // gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
     gl.vertexAttribPointer(positionAttributeLocation, size, type, normalized, stride, offset);
