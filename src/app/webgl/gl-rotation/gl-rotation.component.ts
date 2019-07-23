@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {createProgramFromText} from '../../utils/gl-utils';
+// @ts-ignore
+import vertSource from './vert.vert';
+// @ts-ignore
+import fragSource from './frag.frag';
 
 @Component({
   selector: 'app-gl-rotation',
